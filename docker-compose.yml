@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   database:
-    container_name: database # Nom du conteneur MySQL
+    container_name: database
     image: mysql:latest
     restart: always
     environment:
@@ -14,6 +14,11 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   app:
     build: .
@@ -21,10 +26,17 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       DATABASE_URL: "mysql://admin:admin@database:3306/pompe_funebre"
       NEXTAUTH_URL: "http://localhost:3000"
+      JWT_SECRET: "mon_super_secret"
+    volumes:
+      - "C:/Users/Antoine/Documents/Developpement_Informatique/Projet_Exam_Wild/lesage-lelievre:/app"
+      - /app/node_modules
+      - /app/.next
+      - /app/.turbo
 
 volumes:
   mysql_data:

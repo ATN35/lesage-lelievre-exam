@@ -8,28 +8,29 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique @db.VarChar(255)
-  password String @db.VarChar(255)
+  id           Int           @id @default(autoincrement())
+  email        String        @unique @db.VarChar(255)
+  password     String        @db.VarChar(255)
   reservations Reservation[]
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(255)
-  description String @db.Text
-  price       Float
-  stock       Int
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(255)
+  description  String        @db.Text
+  price        Float
+  stock        Int
   reservations Reservation[]
 }
 
 model Reservation {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   userId    Int
   productId Int
-  status    String   @default("En attente")
+  status    String  @default("En attente")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@index([productId], map: "Reservation_productId_fkey")
+  @@index([userId], map: "Reservation_userId_fkey")
 }
-
